@@ -1,0 +1,114 @@
+/* ===========================
+   GLOBAL THEME
+=========================== */
+
+.stApp {
+    background: linear-gradient(180deg, #08aaef, #0893c1, #a2c3d1);
+    color: #ffffff;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* ===========================
+   TITLE – SLOW ROTATION FEEL
+=========================== */
+
+h1 {
+    text-align: center;
+    color: #ffffff;
+    animation: subtleRotate 30s linear infinite;
+}
+
+@keyframes subtleRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(0.3deg); }
+}
+
+
+
+/* ===========================
+   RISK BOX – CLEAN PANEL
+=========================== */
+
+.risk-box {
+    background: rgb(22, 16, 16);
+    color:#d0d0d0 !important
+    border-left: 4px solid #00e5ff;
+    padding: 16px;
+    border-radius: 10px;
+}
+
+/* ===========================
+   METRICS – WHITE & CLEAN
+=========================== */
+
+[data-testid="stMetricValue"] {
+    color: #ffffff !important;
+    font-size: 26px;
+    font-weight: 600;
+}
+
+[data-testid="stMetricLabel"] {
+    color: #d0d0d0 !important;
+}
+
+/* ===========================
+   INPUTS – DARK MINIMAL
+=========================== */
+
+.stTextInput input,
+[data-testid="stSelectbox"] div {
+    background-color: #223338 !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    border: 1px solid #00e5ff !important;
+}
+
+/* Dropdown menu */
+div[role="listbox"] {
+    background-color: #102a33 !important;
+}
+
+div[role="option"] {
+    color: #ffffff !important;
+    padding: 10px;
+}
+
+div[role="option"]:hover {
+    background-color: #00e5ff !important;
+    color: #f2e8e8 !important;
+}
+
+/* ===========================
+   BUTTON – MINIMAL PULSE
+=========================== */
+
+.stButton > button {
+    background-color: #00e5ff;
+    color: #efeded;
+    border-radius: 10px;
+    font-weight: 600;
+    animation: buttonPulse 3s infinite;
+}
+
+@keyframes buttonPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+}
+
+/* ===========================
+   GENERAL TEXT FIX
+=========================== */
+
+p, span, label {
+    color: #ffffff !important;
+}
+/* ===== FINAL OVERRIDE FOR STREAMLIT MARKDOWN TEXT ===== */
+
+/* Force ALL markdown-rendered text to white */
+.stMarkdown,
+.stMarkdown *,
+div[data-testid="stMarkdownContainer"],
+div[data-testid="stMarkdownContainer"] * {
+    color: #ffffff !important;
+}
