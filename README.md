@@ -1,3 +1,7 @@
+## 🚀 Live Demo
+
+[🌍 Open Disaster Prediction AI](https://disaster-prediction-ai-zhnktjeka2xwbjctzy2yrz.streamlit.app/)
+
 # AI-Based Disaster Prediction & Management System
 
 A Streamlit application for disaster-risk assessment covering Flood, Earthquake and Cyclone scenarios.
