@@ -168,39 +168,5 @@ if st.button("🔍 Check Disaster Risk", type="primary"):
             "indicate a significant immediate disaster-related risk."
         )
 
-    # -----------------------------
-    # AI EXPLANATION
-    # -----------------------------
-
-    st.divider()
-    st.subheader("🤖 AI Risk Explanation")
-
-    try:
-
-        explanation = explain_disaster_risk(
-            "Overall Environmental Risk",
-            risk_level
-        )
-
-        st.write(explanation)
-
-    except Exception:
-
-        st.write(
-            "The assessment is based on the currently available "
-            "environmental data."
-        )
-
-    # -----------------------------
-    # DISCLAIMER
-    # -----------------------------
-
-    st.divider()
-
-    st.caption(
-        "⚠️ This system provides an AI/ML-based risk assessment for "
-        "educational purposes. It is not an official emergency warning "
-        "system. Always follow local government and disaster-management "
-        "authorities for real-world alerts."
-    )
+   
 
