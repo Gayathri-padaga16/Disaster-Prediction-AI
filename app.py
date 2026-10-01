@@ -203,4 +203,4 @@ if st.button("🔍 Check Disaster Risk", type="primary"):
         "system. Always follow local government and disaster-management "
         "authorities for real-world alerts."
     )
-```
+
