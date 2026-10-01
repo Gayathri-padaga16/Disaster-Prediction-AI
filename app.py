@@ -1,9 +1,7 @@
+```python
 import streamlit as st
 
 from utils.weather import get_current_weather
-from predict.predict_flood import predict_flood_risk
-from predict.predict_earthquake import predict_earthquake
-from predict.predict_cyclone import predict_cyclone
 from llm.explain_risk import explain_disaster_risk
 
 st.set_page_config(
@@ -12,103 +10,207 @@ st.set_page_config(
     layout="centered"
 )
 
+
 def load_css():
     try:
         with open("animations.css", encoding="utf-8") as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+            st.markdown(
+                f"<style>{f.read()}</style>",
+                unsafe_allow_html=True
+            )
     except FileNotFoundError:
         pass
+
 
 load_css()
 
 st.title("🌍 AI-Based Disaster Prediction & Management System")
+
 st.caption(
-    "Machine-learning-based disaster risk assessment using environmental "
-    "features, live weather context, and explainable results."
+    "Enter a city to analyze its current environmental conditions "
+    "and assess potential disaster risk."
 )
 
 st.divider()
-st.markdown('<div class="weather-card">🌦️ Live Weather</div>', unsafe_allow_html=True)
 
-city = st.text_input("Enter City Name", value="Chennai")
-weather = get_current_weather(city)
+# -----------------------------
+# CITY INPUT
+# -----------------------------
 
-if weather:
+st.subheader("📍 Enter Location")
+
+city = st.text_input(
+    "City Name",
+    value="Chennai",
+    placeholder="Example: Chennai"
+)
+
+# -----------------------------
+# CHECK DISASTER RISK
+# -----------------------------
+
+if st.button("🔍 Check Disaster Risk", type="primary"):
+
+    if not city.strip():
+        st.warning("Please enter a city name.")
+        st.stop()
+
+    with st.spinner("Fetching live environmental data..."):
+
+        weather = get_current_weather(city)
+
+    if not weather:
+        st.error(
+            "Unable to retrieve live weather data. "
+            "Please check your OpenWeather API key and city name."
+        )
+        st.stop()
+
+    # -----------------------------
+    # LIVE WEATHER
+    # -----------------------------
+
+    st.divider()
+
+    st.subheader("🌦️ Current Environmental Conditions")
+
     col1, col2, col3 = st.columns(3)
-    col1.metric("🌡️ Temperature (°C)", weather["temperature"])
-    col2.metric("💧 Humidity (%)", weather["humidity"])
-    col3.metric("🌬️ Wind Speed (m/s)", weather["wind_speed"])
+
+    col1.metric(
+        "Temperature",
+        f"{weather['temperature']} °C"
+    )
+
+    col2.metric(
+        "Humidity",
+        f"{weather['humidity']} %"
+    )
+
+    col3.metric(
+        "Wind Speed",
+        f"{weather['wind_speed']} m/s"
+    )
+
     st.caption(
-        f"📍 {weather['city']} | {weather['weather']} | "
+        f"📍 {weather['city']} | "
+        f"{weather['weather']} | "
         f"Pressure: {weather['pressure']} hPa"
     )
-else:
-    st.info(
-        "Live weather is unavailable. Add OPENWEATHER_API_KEY to Streamlit "
-        "Secrets to enable it. Disaster risk assessment can still be used."
-    )
 
-st.divider()
+    # -----------------------------
+    # BASIC ENVIRONMENTAL RISK
+    # -----------------------------
 
-disaster = st.selectbox(
-    "Select Disaster Type",
-    ["Flood", "Earthquake", "Cyclone"]
-)
+    temperature = weather["temperature"]
+    humidity = weather["humidity"]
+    wind_speed = weather["wind_speed"]
+    pressure = weather["pressure"]
+    condition = weather["weather"].lower()
 
-st.divider()
+    risk_points = 0
+    possible_risk = []
 
-if disaster == "Flood":
-    st.subheader("🌊 Flood Input Parameters")
-    slope = st.number_input("Slope", value=60.0)
-    twi = st.number_input("Topographic Wetness Index (TWI)", value=-4.1)
-    fa = st.number_input("Flow Accumulation (FA)", value=150.0)
-    drainage = st.number_input("Drainage", value=235.0)
-    rainfall = st.number_input("Rainfall (mm)", value=120.0)
+    # Heavy rain / storm conditions
+    if any(word in condition for word in [
+        "heavy rain",
+        "thunderstorm",
+        "torrential",
+        "rain"
+    ]):
+        risk_points += 2
+        possible_risk.append("Heavy rainfall / flooding")
 
-    if st.button("Predict Flood Risk", type="primary"):
-        risk = predict_flood_risk(slope, twi, fa, drainage, rainfall)
-        st.subheader(f"🚨 Flood Risk Level: {risk}")
-        st.write(explain_disaster_risk("Flood", risk))
+    # Very high humidity
+    if humidity >= 90:
+        risk_points += 1
 
-elif disaster == "Earthquake":
-    st.subheader("🌋 Earthquake Input Parameters")
-    magnitude = st.number_input("Magnitude", value=6.5)
-    depth = st.number_input("Depth (km)", value=50.0)
-    latitude = st.number_input("Latitude", value=10.0)
-    longitude = st.number_input("Longitude", value=76.0)
-    tsunami = st.selectbox("Tsunami Warning", [0, 1])
+    # Strong wind
+    if wind_speed >= 15:
+        risk_points += 2
+        possible_risk.append("Strong wind / storm conditions")
+    elif wind_speed >= 10:
+        risk_points += 1
 
-    if st.button("Predict Earthquake Risk", type="primary"):
-        risk = predict_earthquake(
-            magnitude, depth, latitude, longitude, tsunami
+    # Low atmospheric pressure
+    if pressure < 1000:
+        risk_points += 1
+
+    # Extreme temperature
+    if temperature >= 45 or temperature <= 5:
+        risk_points += 1
+        possible_risk.append("Extreme temperature")
+
+    # -----------------------------
+    # OVERALL RESULT
+    # -----------------------------
+
+    st.divider()
+    st.subheader("🚨 Disaster Risk Assessment")
+
+    if risk_points >= 4:
+
+        risk_level = "HIGH"
+        st.error("🚨 POTENTIAL DISASTER RISK DETECTED")
+
+    elif risk_points >= 2:
+
+        risk_level = "MODERATE"
+        st.warning("⚠️ POTENTIAL ENVIRONMENTAL RISK DETECTED")
+
+    else:
+
+        risk_level = "LOW"
+        st.success("✅ NO SIGNIFICANT DISASTER RISK DETECTED")
+
+    st.write(f"**Overall Risk Level:** {risk_level}")
+
+    if possible_risk:
+
+        st.write("**Possible concern:**")
+
+        for risk in possible_risk:
+            st.write(f"- {risk}")
+
+    else:
+
+        st.write(
+            "The current available environmental conditions do not "
+            "indicate a significant immediate disaster-related risk."
         )
-        st.subheader(f"🚨 Earthquake Risk Level: {risk}")
-        st.write(explain_disaster_risk("Earthquake", risk))
 
-else:
-    st.subheader("🌪️ Cyclone Input Parameters")
-    sea_temp = st.number_input("Sea Surface Temperature (°C)", value=28.0)
-    pressure = st.number_input("Atmospheric Pressure (hPa)", value=1005.0)
-    humidity = st.number_input("Humidity (%)", value=80.0)
-    wind_shear = st.number_input("Wind Shear", value=15.0)
-    vorticity = st.number_input("Vorticity", value=0.00002, format="%.7f")
-    ocean_depth = st.number_input("Ocean Depth", value=80.0)
-    latitude = st.number_input("Latitude", value=15.0)
-    pre_disturbance = st.selectbox("Pre-existing Disturbance", [0, 1])
-    proximity = st.number_input("Proximity to Coastline (km)", value=1.5)
+    # -----------------------------
+    # AI EXPLANATION
+    # -----------------------------
 
-    if st.button("Predict Cyclone Risk", type="primary"):
-        inputs = {
-            "Sea_Surface_Temperature": sea_temp,
-            "Atmospheric_Pressure": pressure,
-            "Humidity": humidity,
-            "Wind_Shear": wind_shear,
-            "Vorticity": vorticity,
-            "Ocean_Depth": ocean_depth,
-            "Latitude": latitude,
-            "Pre_existing_Disturbance": pre_disturbance,
-            "Proximity_to_Coastline": proximity,
-        }
-        risk = predict_cyclone(inputs)
-        st.subheader(f"🚨 Cyclone Risk Level: {risk}")
-        st.write(explain_disaster_risk("Cyclone", risk))
+    st.divider()
+    st.subheader("🤖 AI Risk Explanation")
+
+    try:
+
+        explanation = explain_disaster_risk(
+            "Overall Environmental Risk",
+            risk_level
+        )
+
+        st.write(explanation)
+
+    except Exception:
+
+        st.write(
+            "The assessment is based on the currently available "
+            "environmental data."
+        )
+
+    # -----------------------------
+    # DISCLAIMER
+    # -----------------------------
+
+    st.divider()
+
+    st.caption(
+        "⚠️ This system provides an AI/ML-based risk assessment for "
+        "educational purposes. It is not an official emergency warning "
+        "system. Always follow local government and disaster-management "
+        "authorities for real-world alerts."
+    )
+```
