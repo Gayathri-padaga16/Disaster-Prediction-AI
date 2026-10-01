@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 
 from utils.weather import get_current_weather
@@ -45,10 +45,6 @@ city = st.text_input(
     placeholder="Example: Chennai"
 )
 
-# -----------------------------
-# CHECK DISASTER RISK
-# -----------------------------
-
 if st.button("🔍 Check Disaster Risk", type="primary"):
 
     if not city.strip():
@@ -66,9 +62,6 @@ if st.button("🔍 Check Disaster Risk", type="primary"):
         )
         st.stop()
 
-    # -----------------------------
-    # LIVE WEATHER
-    # -----------------------------
 
     st.divider()
 
@@ -140,9 +133,6 @@ if st.button("🔍 Check Disaster Risk", type="primary"):
         risk_points += 1
         possible_risk.append("Extreme temperature")
 
-    # -----------------------------
-    # OVERALL RESULT
-    # -----------------------------
 
     st.divider()
     st.subheader("🚨 Disaster Risk Assessment")
